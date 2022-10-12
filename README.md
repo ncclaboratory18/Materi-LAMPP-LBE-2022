@@ -1,10 +1,12 @@
-## APA ITU LAMP
+# LAMPP
+
+## Apa itu LAMPP?
 
 ![alt text](./src/lampu.jpg)
 
 Lampp merupakan singkatan dari Linux, Apache, MySQL, perl/php/python. Merupakan sebuah paket perangkat lunak bebas yang digunakan untuk menjalankan sebuah aplikasi secaralengkap
 
-Komponen-komponen dari LAMP:
+### Komponen-komponen dari LAMP:
 - **Linux** Linux sendiri berperan sebagai sistem informasi yang berbasi Unix yang digunakan oleh pengguna secara gratis. Linux sendiri merupakan perwakilan dari sistem lainnya seperti FreeBSD, NetBSD, OpenBSD dan Darwin/Mac OS X.
 - **Apache** Komponen ke dua ini adalah web browser open source yang artinya dapat digunakan secara gratis. Fungsi utama Apache ini dapat menghasilkan halam web yang telah programmer kerjakan  menggunakan bahasa pemrogramman PHP.
 - **MySQL** Terdengan cukup familiar memang, komponen ini merupakan sistem database yang sering digunakan bersama PHP.
@@ -12,36 +14,157 @@ Komponen-komponen dari LAMP:
 
 Beberapa perangkat lunak yang menggunakan konfigurasi LAMP antara lain MediaWiki dan Bugzilla.
 
-## Kelebihan menggunakan LAMPP
+### Kelebihan menggunakan LAMPP
 - memiliki sistem database yang keamanannya terjamin
 - proses development yang lebih cepat
 - dapat dikustomisasi sesuai kebutuhan developer
 - kode di dalamnya dapat bekerja pada berbagai OS, seperti Windows, Linux, Android, dan iOS
 
-## Cara instalasi
+## Install LAMPP
+Pertama-tama, update dahulu dependency version.
+```
+sudo apt update
+```
 
- 1. file instalasi dapat di download [di sini](https://bitnami.com/stack/lamp/installer)
- 2. langsung saja di install tadi downloadnya 
-   
-   ![gambar1](src/pict1.jpg)
+### Apache2
+Install apache2 dengan command berikut:
+```
+sudo apt install apache2
+```
+Lalu, kita perlu mengatur konfigurasi firewall (UFW) untuk mengizinkan HTTP protocol yang diinginkan.
+```
+sudo ufw app list
+```
+![image](https://user-images.githubusercontent.com/78243059/195121362-20b9f73c-f1a2-4271-9442-844901a5c180.png)  
+Deskripsi:
+1. Apache: terbuka untuk port 80 (HTTP)
+2. Apache Full: terbuka untuk port 80 (HTTP) dan 443 (HTTPS)
+3. Apache Secure: terbuka untuk port 443 (HTTPS)
 
- 3. langsung di klik next aja
-   
-   ![gambar1](src/pict2.jpg)
-   ![gambar1](src/pict3.jpg)
-   ![gambar1](src/pict4.jpg)
+Kali ini, kita akan membuka koneksi baik untuk protokol HTTP dan HTTPS dengan command berikut
+```
+sudo ufw allow in "Apache Full"
+```
+Cek perubahannya dengan command ini
+```
+sudo ufw status
+```
 
- 4. ketikkan password yang mau dugunakan untuk akun SQL  
-     
-   ![gambar1](src/pict5.jpg)
-   ![gambar1](src/pict6.jpg)
-   ![gambar1](src/pict7.jpg)
-   ![gambar1](src/pict8.jpg)
+Pastikan web server sudah menyala dengan command berikut
+```
+sudo service apache2 start
+```
+Web server bisa diakses pada *http://localhost* atau menggunakan server public IP address yang bisa dicek dengan cara
+```
+ip addr show eth0 | grep inet | awk '{ print $2; }' | sed 's/\/.*$//'
+```
+lalu dapat diakses dengan *http://\<ip-address-server\>*
 
- 5. Instalasi selesai LAMMP dapat di gunakan
-   
-   ![gambar1](src/pict9.jpg)
+### MySQL
+Install mysql dengan command berikut
+```
+sudo apt install mysql-server
+```
+Opsional namun direkomendasikan untuk mengonfigurasi keamanan. MySQL dilengkapi dengan script yang bisa menghapus pengaturan bawaan yang kurang aman dan mengunci akses ke sistem database.
+```
+sudo mysql_secure_installation
+```
+![image](https://user-images.githubusercontent.com/78243059/195124659-e1d775c0-93cc-4c57-914c-9c9c43a094a3.png)
 
-Gunakan username `root` dan password yang di masukkan pada saat instalasi untuk menggunakan phpMyAdmin
+![image](https://user-images.githubusercontent.com/78243059/195124766-8381395b-4e41-4794-81e1-e5b3b4b19b6b.png)
 
-![gambar1](src/pict10.jpg)
+![image](https://user-images.githubusercontent.com/78243059/195124979-d6778e09-4b99-4964-afa6-56d0d67d2281.png)
+
+Tekan Y atau Enter untuk sisa pertanyaan yang lain untuk menghapus user anonymous, mengahpus database testing, menutup akses remote, dan menerapkan peraturan-peraturan baru yang baru saja dikonfigurasi.
+
+Database bisa diakses dengan command
+```
+sudo mysql -u root -p
+```
+Masukkan password yang tadi sudah diatur, lalu database sudah berhasil diakses.
+
+### PHP
+Install php dengan command
+```
+sudo apt install php libapache2-mod-php php-mysql
+```
+Kita juga menginstall library libapache2-mod-php (untuk memungkinkan Apache menangani file php) dan php-mysql (memungkinkan php berinteraksi dengan mysql).
+
+Kita bisa mengecek apakah php sudah berhasil terinstall dengan command
+```
+php -v
+```
+![image](https://user-images.githubusercontent.com/78243059/195126664-432e4856-cd4c-4755-854a-77f3a50158e8.png)
+
+
+## Tambahan
+
+### Mengubah Root File
+Saat mengakses *http://localhost*, server secara default akan membuka file *index.html* yang berada di */var/www/html*. Pengaturan ini diatur di */etc/apache2/mods-enabled/dir.conf* dan bisa kita ubah.
+![image](https://user-images.githubusercontent.com/78243059/195129652-c10f47b8-c895-4641-8ec3-572045c6cc77.png)
+
+File di sebelah kiri memliki prioritas untuk dibuka pertama lebih dahulu. Kita bisa mengubah urutan file tersebut, menghapus, maupun menambahkan file yang baru.   Contoh: kita bisa menambahkan file *info.php* di paling kiri untuk dibuka secara default.
+```
+DirectoryIndex info.php index.html index.cgi index.pl index.php index.xhtml index.htm
+```
+Lalu di */var/www/html*, kita perlu membuat file *info.php* tersebut dengan command
+```
+sudo nano /var/www/html/info.php 
+```
+Lalu isi file dengan syntax
+```
+<?php
+phpinfo();
+```
+Simpan file, lalu restart server dengan command
+```
+sudo service apache2 restart
+```
+Buka kembali halaman *http://localhost* untuk melihat perubahannya.
+
+### Mengubah Root Directory
+Root directory diatur di */etc/apache2/sites-available/000-default.conf*, tepatnya pada line ini
+```
+DocumentRoot /var/www/html
+```
+Kita bisa mengubahnya sesuai path yang kita mau. Misalnya, kita menaikkan path satu langkah menjadi
+```
+DocumentRoot /var/www
+```
+Restart server. Maka, server akan mencari file info.php dan lain-lainnya tadi pada path */var/www*. Server tidak akan menyajikan file tersebut jika tidak berhasil menemukannya.  
+Untuk itu, kita perlu memindahkan file info.php ke root path tersebut
+```
+sudo mv /var/www/html/info.php /var/www/info.php 
+```
+Akses kembali *http://localhost* dan halaman info.php berhasil muncul.
+
+### Konfigurasi Default Port
+Saat kita mengakses suatu URL, secara default kita mengakses port 80  (protocol HTTP), begitupun juga Apache yang secara default menyajikan halaman pada port 80. Kita bisa mengubah pengaturan ini di /etc/apache2/ports.conf
+```
+Listen 80
+
+<IfModule ssl_module>
+        Listen 443
+</IfModule>
+
+<IfModule mod_gnutls.c>
+        Listen 443
+</IfModule>
+```
+Kita cukup mengubah Listen 80 menjadi port lain yang kita inginkan. Restart server, lalu akses *http://localhost:\<port-number\>*.
+
+### Konfigurasi Virtual Host
+Selain mengakses web server dengan nama localhost atau IP server, kita bisa meng-custom nama domain kita sendiri.  
+Kita buat folder yang akan menyimpan file-file web kita dengan
+```
+sudo mkdir /var/www/your_domain
+```
+Atur permission pada folder sehingga bisa kita edit.
+```
+sudo chmod -R 755 /var/www/your_domain
+```
+Buat halaman web kalian pada folder tersebut.
+```
+sudo nano /var/www/your_domain/index.html
+```
+
