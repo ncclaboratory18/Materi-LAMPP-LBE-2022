@@ -1,4 +1,4 @@
-****# LAMPP
+# LAMPP
 
 ## Apa itu LAMPP?
 
