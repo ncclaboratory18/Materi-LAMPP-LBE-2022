@@ -65,7 +65,15 @@ Install mysql dengan command berikut
 ```
 sudo apt install mysql-server
 ```
-Opsional namun direkomendasikan untuk mengonfigurasi keamanan. MySQL dilengkapi dengan script yang bisa menghapus pengaturan bawaan yang kurang aman dan mengunci akses ke sistem database.
+Setelah mysql terinstall, kita perlu menjalankan servicenya dahulu dengan command
+```
+sudo service mysql start
+```
+Maka, mysql bisa langsung diakses dengan
+```
+sudo mysql
+```
+Walaupun opsional, namun direkomendasikan untuk mengonfigurasi keamanan database. MySQL dilengkapi dengan script yang bisa menghapus pengaturan bawaan yang kurang aman dan mengunci akses ke sistem database.
 ```
 sudo mysql_secure_installation
 ```
