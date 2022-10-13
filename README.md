@@ -1,4 +1,4 @@
-# LAMPP
+****# LAMPP
 
 ## Apa itu LAMPP?
 
@@ -97,9 +97,9 @@ php -v
 ![image](https://user-images.githubusercontent.com/78243059/195126664-432e4856-cd4c-4755-854a-77f3a50158e8.png)
 
 
-## Tambahan
+# Tambahan
 
-### Mengubah Root File
+## Mengubah Root File
 Saat mengakses *http://localhost*, server secara default akan membuka file *index.html* yang berada di */var/www/html*. Pengaturan ini diatur di */etc/apache2/mods-enabled/dir.conf* dan bisa kita ubah.
 ![image](https://user-images.githubusercontent.com/78243059/195129652-c10f47b8-c895-4641-8ec3-572045c6cc77.png)
 
@@ -138,7 +138,7 @@ sudo mv /var/www/html/info.php /var/www/info.php
 ```
 Akses kembali *http://localhost* dan halaman info.php berhasil muncul.
 
-### Konfigurasi Default Port
+## Konfigurasi Default Port
 Saat kita mengakses suatu URL, secara default kita mengakses port 80  (protocol HTTP), begitupun juga Apache yang secara default menyajikan halaman pada port 80. Kita bisa mengubah pengaturan ini di /etc/apache2/ports.conf
 ```
 Listen 80
@@ -153,18 +153,57 @@ Listen 80
 ```
 Kita cukup mengubah Listen 80 menjadi port lain yang kita inginkan. Restart server, lalu akses *http://localhost:\<port-number\>*.
 
-### Konfigurasi Virtual Host
+## Konfigurasi Virtual Host
 Selain mengakses web server dengan nama localhost atau IP server, kita bisa meng-custom nama domain kita sendiri.  
 Kita buat folder yang akan menyimpan file-file web kita dengan
 ```
-sudo mkdir /var/www/your_domain
+sudo mkdir -p /var/www/your_domain_1/public_html
 ```
 Atur permission pada folder sehingga bisa kita edit.
-```
+```bash:
 sudo chmod -R 755 /var/www/your_domain
 ```
 Buat halaman web kalian pada folder tersebut.
 ```
 sudo nano /var/www/your_domain/index.html
 ```
+isi file html untuk menandakan page tersebut
+```html:
+<html>
+  <head>
+    <title>Welcome to your_domain_1!</title>
+  </head>
+  <body>
+    <h1>Success! The your_domain_1 virtual host is working!</h1>
+  </body>
+</html>
+```
+membuat Virtual Host Files
+```script:
+sudo nano /etc/apache2/sites-available/your_domain_1.conf
+```
+isi file `your_domain_1.conf` dengan isi sebagai berikut :
+```conf:
+<VirtualHost *:80>
+   	ServerAdmin admin@your_domain_1
+    	ServerName your_domain_1
+        ServerAlias your_domain_1
+        DocumentRoot /var/www/your_domain_1/public_html
 
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+```
+Enabling the New Virtual Host Files
+```bash:
+sudo a2ensite your_domain_1.conf
+```
+disable the default site
+```bash:
+sudo a2dissite 000-default.conf
+```
+restart apache2 untuk melihat keajaiban
+```bash:
+sudo service apache2 restart
+```
+virtual host dapat di akses pada [your_domain_1](http://your_domain_1)
