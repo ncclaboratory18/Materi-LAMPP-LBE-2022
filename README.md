@@ -85,6 +85,11 @@ sudo mysql_secure_installation
 
 Tekan Y atau Enter untuk sisa pertanyaan yang lain untuk menghapus user anonymous, mengahpus database testing, menutup akses remote, dan menerapkan peraturan-peraturan baru yang baru saja dikonfigurasi.
 
+Jika menemukan error *Failed! Error: SET PASSWORD has no significance for user 'root'@'localhost' as the authentication method used doesn't store authentication data in the MySQL server. Please consider using ALTER USER instead if you want to change authentication parameters.*, maka alter password dahulu pada database.
+```
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password by 'mynewpassword'
+```
+
 Database bisa diakses dengan command
 ```
 sudo mysql -u root -p
